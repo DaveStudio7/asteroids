@@ -26,7 +26,7 @@ def main():
     dt = 0
     player = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
 
-    font = pygame.font.Font(None, 36)
+    font = pygame.font.Font(None, 32)
     
     while True:
         for event in pygame.event.get():
@@ -39,6 +39,8 @@ def main():
 
         score_text = font.render(f"Score: {player.score}", True, (255, 255, 255))
         screen.blit(score_text, (10, 10))
+        lives_text = font.render(f"Lives: {player.lives}", True, (255, 255, 255))
+        screen.blit(lives_text, (10, 40))
 
         pygame.display.flip()
         updatable.update(dt)
@@ -51,9 +53,15 @@ def main():
                     player.score += 10
 
         for asteroid in asteroids:
-            if asteroid.collisions(player):
-                print("Game over!")
-                sys.exit()
+            if asteroid.collisions(player) and player.invulnerable_timer <= 0:
+                player.lives -= 1
+                if player.lives > 0:
+                    player.position = (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
+                    player.velocity = pygame.Vector2(0, 0)
+                    player.invulnerable_timer = 2
+                else:
+                    print("Game over!")
+                    sys.exit()
         
         dt = clock.tick(60) / 1000
 
